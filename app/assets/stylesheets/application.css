@@ -19,11 +19,11 @@
  }
 
  .bgbluetomato {
-   background-image: url("/assets/Optimized-btomato.jpeg");
+   background-image: image-url("/assets/Optimized-btomato.jpeg");
  }
 
  .bgbrighttomato {
-   background-image: url("/assets/bizzare.jpeg");
+   background-image: image-url("/assets/bizzare.jpeg");
    background-color: rgba(255, 255, 255, 0.8);
    background-blend-mode: exclusion;
    border-radius: 25px;
