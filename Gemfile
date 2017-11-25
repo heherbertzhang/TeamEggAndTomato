@@ -74,3 +74,4 @@ gem 'jquery-rails'
 gem 'filterrific'
 gem 'will_paginate'
 gem 'will_paginate-bootstrap'
+gem 'rails_12factor', group: :production #need this for rails 4 assets on heroku
