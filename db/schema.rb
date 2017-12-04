@@ -12,6 +12,9 @@
 
 ActiveRecord::Schema.define(version: 20171204184321) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "accounts", force: :cascade do |t|
     t.text "email"
     t.text "username"
@@ -34,15 +37,15 @@ ActiveRecord::Schema.define(version: 20171204184321) do
     t.string "zip"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "profile_id"
+    t.bigint "profile_id"
     t.index ["profile_id"], name: "index_addresses_on_profile_id"
   end
 
   create_table "applicants", force: :cascade do |t|
-    t.integer "client_request_id"
+    t.bigint "client_request_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id"
+    t.bigint "user_id"
     t.index ["client_request_id"], name: "index_applicants_on_client_request_id"
     t.index ["user_id"], name: "index_applicants_on_user_id"
   end
@@ -58,16 +61,16 @@ ActiveRecord::Schema.define(version: 20171204184321) do
     t.integer "matched_user"
     t.string "service_name"
     t.string "title"
-    t.integer "address_id"
+    t.bigint "address_id"
     t.integer "progress"
     t.text "fullfillment"
     t.integer "rating"
     t.text "feedback"
     t.string "city"
-    t.integer "user_id"
+    t.bigint "user_id"
     t.integer "payment"
     t.string "payment_status"
-    t.integer "free_address_id"
+    t.bigint "free_address_id"
     t.string "received"
     t.index ["address_id"], name: "index_client_requests_on_address_id"
     t.index ["free_address_id"], name: "index_client_requests_on_free_address_id"
@@ -102,14 +105,14 @@ ActiveRecord::Schema.define(version: 20171204184321) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "ispublic"
-    t.integer "client_request_id"
-    t.integer "user_id"
+    t.bigint "client_request_id"
+    t.bigint "user_id"
     t.index ["client_request_id"], name: "index_messages_on_client_request_id"
     t.index ["user_id"], name: "index_messages_on_user_id"
   end
 
   create_table "profiles", force: :cascade do |t|
-    t.integer "user_id"
+    t.bigint "user_id"
     t.date "date_of_birth"
     t.string "about_me"
     t.string "phone"
@@ -181,4 +184,12 @@ ActiveRecord::Schema.define(version: 20171204184321) do
     t.string "password_hash"
   end
 
+  add_foreign_key "addresses", "profiles"
+  add_foreign_key "applicants", "client_requests"
+  add_foreign_key "applicants", "users"
+  add_foreign_key "client_requests", "addresses"
+  add_foreign_key "client_requests", "free_addresses"
+  add_foreign_key "client_requests", "users"
+  add_foreign_key "messages", "client_requests"
+  add_foreign_key "messages", "users"
 end
