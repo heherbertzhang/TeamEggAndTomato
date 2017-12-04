@@ -9,7 +9,19 @@ class UsersController < ApplicationController
     if @user.valid?
       redirect_to login_path
     else
-      render 'new' # TODO: Add error messages and repopulate form
+      render 'new'
+    end
+  end
+
+  def index
+    @users = User.all()
+  end
+
+  def destroy
+    if logged_in_user_or_guest.username == "admin"
+      @user = User.find(params[:id])
+      @user.destroy
+      redirect_to "/users"
     end
   end
 

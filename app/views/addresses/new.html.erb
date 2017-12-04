@@ -1,0 +1,35 @@
+<% if @address.errors.any? %>
+  <div id="error_explanation">
+    <div class="alert alert-danger">
+      The form contains <%= pluralize(@address.errors.count, 'error') %>.
+    </div>
+    <ul>
+      <% @address.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_for @address do |form| %>
+    <p>
+      <%= form.label :line1 %><br>
+      <%= form.text_field :line1%><br>
+
+      <%= form.label :line2 %><br>
+      <%= form.text_field :line2 %><br>
+
+      <%= form.label :city %><br>
+      <%= form.text_field :city%><br>
+
+      <%= form.label :state %><br>
+      <%= form.text_field :state %><br>
+
+      <%= form.label :zip %><br>
+      <%= form.text_field :zip %><br>
+    </p>
+
+    <p>
+      <%= form.submit %>
+    </p>
+<% end %>

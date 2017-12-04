@@ -90,26 +90,29 @@ class ClientRequestsController < ApplicationController
 
   def edit
     @client_request = ClientRequest.find(params[:id])
-    @address = Address.find(@client_request.address_id)
+    @address = FreeAddress.find(@client_request.address_id)
   end
 
   def destroy
     @client_request = ClientRequest.find(params[:id])
-    @client_request.destroy
-
-    redirect_to client_requests_path
+    if @client_request.user_id == logged_in_user_or_guest.id || logged_in_user_or_guest.username == "admin"
+      @client_request.destroy
+      redirect_to client_requests_path
+    end
   end
 
   def update
     @client_request = ClientRequest.find(params[:id])
-    @address = Address.find(@client_request.address_id)
+    if @client_request.user_id == logged_in_user_or_guest.id || logged_in_user_or_guest.username == "admin"
+      @address = FreeAddress.find(@client_request.address_id)
 
-    if @address.update(address_params) && @client_request.update(client_request_params)
-      @client_request.city = @address.city
-      @client_request.save()
-      redirect_to @client_request
-    else
-      render 'edit'
+        if @address.update(address_params) && @client_request.update(client_request_params)
+          @client_request.city = @address.city
+          @client_request.save()
+          redirect_to @client_request
+        else
+          render 'edit'
+        end
     end
   end
 
@@ -148,10 +151,11 @@ class ClientRequestsController < ApplicationController
 
   def auto_match
     @client_request = ClientRequest.find(params[:id]) #.where("city=? or city=nil",@client_request.city).
-    @matched_user = User.joins("INNER JOIN client_requests \
+    @matched_user = User.joins("LEFT OUTER JOIN client_requests \
       ON client_requests.matched_user = users.id").
-        where("(users.city IS ? or users.city = ?) AND users.id != ? AND client_requests.period != ?",
-        nil, @client_request.city, @client_request.user_id, @client_request.period.to_s).first
+        where("users.username != 'admin' AND users.username != 'service' \
+          AND (users.city IS ? or users.city = ?) AND users.id != ? AND (client_requests.period IS ? OR client_requests.period != ?)",
+        nil, @client_request.city, @client_request.user_id, nil, @client_request.period.to_s).order("RANDOM()").first
 
     if !@matched_user
       flash[:error] = "Cannot find any potential user to match! Please wait for applicants or try again later."
@@ -167,9 +171,16 @@ class ClientRequestsController < ApplicationController
   def create
     if require_logged_in()
       @client_request = ClientRequest.new(client_request_params)
-      @address = Address.new(address_params)
+      @address = FreeAddress.new(address_params)
+	  logger.debug "address state ====================================="
+      logger.debug @address.state
+	  logger.debug "after state"
       @client_request.user_id = logged_in_user_or_guest.id
+	  logger.debug(logged_in_user_or_guest.id)
+	  logger.debug "not saved any"
+	  logger.debug @address.errors.any?
       if @address.save
+        logger.debug "save success address"
         @client_request.address_id = @address.id
         if @client_request.save
   		    #@address=@client_request.build_address(address_params).save
@@ -180,15 +191,19 @@ class ClientRequestsController < ApplicationController
           if @client_request.save
             redirect_to @client_request
           else
-            @client_request.delete
             @address.delete
             render 'new'
           end
         else
-          @address.delete
+          logger.debug "save not client request"
+          logger.debug @client_request.errors.any?
           render 'new'
+          @address.delete
         end
       else
+		logger.debug @client_request.errors.any?
+        logger.debug "save not address"
+        logger.debug @address.errors
         render 'new'
       end
     end
@@ -208,5 +223,4 @@ class ClientRequestsController < ApplicationController
     end
     redirect_to client_request_path(client_request)
   end
-
 end

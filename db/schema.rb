@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171125213541) do
+ActiveRecord::Schema.define(version: 20171204184321) do
 
   create_table "accounts", force: :cascade do |t|
     t.text "email"
@@ -34,6 +34,8 @@ ActiveRecord::Schema.define(version: 20171125213541) do
     t.string "zip"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "profile_id"
+    t.index ["profile_id"], name: "index_addresses_on_profile_id"
   end
 
   create_table "applicants", force: :cascade do |t|
@@ -63,7 +65,12 @@ ActiveRecord::Schema.define(version: 20171125213541) do
     t.text "feedback"
     t.string "city"
     t.integer "user_id"
+    t.integer "payment"
+    t.string "payment_status"
+    t.integer "free_address_id"
+    t.string "received"
     t.index ["address_id"], name: "index_client_requests_on_address_id"
+    t.index ["free_address_id"], name: "index_client_requests_on_free_address_id"
     t.index ["user_id"], name: "index_client_requests_on_user_id"
   end
 
@@ -73,6 +80,16 @@ ActiveRecord::Schema.define(version: 20171125213541) do
     t.date "birth_date"
     t.string "email_address"
     t.string "cell_phone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "free_addresses", force: :cascade do |t|
+    t.string "line1"
+    t.string "line2"
+    t.string "city"
+    t.string "state"
+    t.string "zip"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -99,6 +116,10 @@ ActiveRecord::Schema.define(version: 20171125213541) do
     t.string "gender"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "image_file_name"
+    t.string "image_content_type"
+    t.integer "image_file_size"
+    t.datetime "image_updated_at"
     t.index ["user_id"], name: "index_profiles_on_user_id"
   end
 
@@ -131,10 +152,24 @@ ActiveRecord::Schema.define(version: 20171125213541) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "transactions", force: :cascade do |t|
+    t.integer "from"
+    t.string "transaction_type"
+    t.string "transaction_method"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "transaction_amount"
+    t.integer "target"
+    t.integer "creq_id"
+    t.string "status"
+    t.text "notification_params"
+    t.string "transaction_id"
+    t.datetime "purchased_at"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "username", null: false
-    t.string "password", null: false
     t.string "fname", null: false
     t.string "lname", null: false
     t.binary "salt"
@@ -143,6 +178,7 @@ ActiveRecord::Schema.define(version: 20171125213541) do
     t.float "rating"
     t.integer "rating_count"
     t.string "city"
+    t.string "password_hash"
   end
 
 end

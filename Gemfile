@@ -24,6 +24,9 @@ gem 'uglifier', '>= 1.3.0'
 # authorization of stripe api
 gem 'omniauth-stripe-connect'
 gem 'stripe'
+# paypal
+gem 'paypal-sdk-rest'
+
 # secure env vars
 gem 'dotenv-rails', :groups => [:development, :test]
 # devise for authentication handling
@@ -34,10 +37,13 @@ gem 'coffee-rails', '~> 4.2'
 gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
+# Store images
+gem 'paperclip', '~> 4.1.1'
+
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+gem 'bcrypt', '~> 3.1.7', platforms: :ruby
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
@@ -74,5 +80,11 @@ gem 'recurring_select', github: "RundownApp/recurring_select"
 gem 'jquery-rails'
 gem 'filterrific'
 gem 'will_paginate'
-gem 'will_paginate-bootstrap'
 gem 'rails_12factor', group: :production #need this for rails 4 assets on heroku
+gem 'will_paginate-bootstrap'
+
+group :test, :development do
+  gem 'cucumber-rails', :require => false
+  # database_cleaner is not required, but highly recommended
+  gem 'database_cleaner'
+end

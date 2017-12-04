@@ -1,18 +1,21 @@
+<% if @profile.errors.any? %>
+  <div id="error_explanation">
+    <div class="alert alert-danger">
+      The form contains <%= pluralize(@profile.errors.count, 'error') %>.
+    </div>
+    <ul>
+      <% @profile.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
 <%= form_for @profile do |form| %>
-    <% if @profile.errors.any? %>
-        <div id="error_explanation">
-          <h2>
-            <%= pluralize(@profile.errors.count, "error") %> prohibited
-            this request from being saved:
-          </h2>
-          <ul>
-            <% @profile.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-            <% end %>
-          </ul>
-        </div>
-    <% end %>
-	<! add errors>
+    <p>
+      <%= form.label 'Profile Picture' %>
+      <%= form.file_field :image %>
+    </p>
     <p>
       <%= form.label :about_me %><br>
       <%= form.text_area :about_me %><br>
@@ -26,6 +29,26 @@
 	  <%= form.label :gender %><br>
 	  <%= form.select :gender, Profile::GENDER_TYPES %><br>
     </p>
+
+    <% if @profile.persisted? %>
+      <% if @profile.address.nil? %>
+        <p><%= link_to 'Add address', new_address_path %></p>
+      <% else %>
+            <p>
+              <strong>Address</strong><br>
+              <%= logged_in_user.profile.address.line1 %><br>
+              <% if !logged_in_user.profile.address.line2.nil? && !logged_in_user.profile.address.line2.empty? %>
+                  <%= logged_in_user.profile.address.line2 %><br>
+              <% end %>
+              <%= logged_in_user.profile.address.city + ', ' +
+                      logged_in_user.profile.address.state + '  ' +
+                      logged_in_user.profile.address.zip %><br>
+            </p>
+
+            <p><%= link_to 'Edit address', edit_address_path %></p>
+      <% end %>
+    <% end %>
+
     <p>
       <%= form.submit %>
     </p>

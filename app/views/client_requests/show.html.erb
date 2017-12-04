@@ -21,7 +21,7 @@
 
     <p class="breakall">
       <strong>Location:</strong>
-      <% address = Address.find(@client_request.address_id) %>
+      <% address = FreeAddress.find(@client_request.address_id) %>
       <%= address.city %>
       <%= address.zip %>
     </p>
@@ -97,6 +97,23 @@
             <br>
             <%=form.submit "Update Progress", class: "form-control btn btn-success"%>
           <%end%>
+
+		  <br>
+
+		  <!-- receive payments -->
+		  <center>
+
+		  <% if @client_request.received == "true" %>
+			  	Please check your paypal account to claim payment.
+		  <% elsif @client_request.payment_status == "Complete" %>
+			  <%= form_tag transactions_pay_path do %>
+				  Payments: <%= @client_request.payment %> USD <br>
+				  <%= hidden_field_tag :client_req_id, @client_request.id %>
+				  <%= submit_tag("Receive Payment") %>
+			  <% end %>
+		  <%end%>
+
+	  </center>
         <%else%>
           <p>
             <h5>Progress:</h5>
@@ -137,14 +154,21 @@
         <%end%>
         <% if logged_in_user_or_guest.id == @client_request.user_id %>
           <hr>
-    			<form class="" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"%>
-            Payment: <input type="" name="value", class="">
-    				<input type="hidden" name="cmd" value="_s-xclick">
-    				<input type="hidden" name="hosted_button_id" value="VRDB54ENGD2X8">
-    				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_paynowCC_LG.gif"
-    					border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-    				<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-    			</form>
+		  		<center>
+					<% if @client_request.payment_status != "Complete" %>
+						<%= form_tag(transactions_create_path) do %>
+							<%= label_tag(:cost, "Payment: ") %>
+							<%= text_field_tag(:cost) %>
+							<%= hidden_field_tag :client_req_id, @client_request.id %>
+							<%= image_submit_tag("https://www.paypalobjects.com/en_US/i/btn/btn_paynowCC_LG.gif") %>
+						<% end %>
+					<% else %>
+						<h4>
+						Payment of <%= @client_request.payment %> USD <br>
+						To <%= User.find(@client_request.matched_user).username %>
+						</h4>
+					<% end %>
+			</center>
         <%end%>
 
       <%else%>

@@ -1,9 +1,14 @@
 <% if logged_in? && logged_in_user.id == @profile_user.id%>
     <h3>Welcome to your page, <%= logged_in_user.fname%> <%= logged_in_user.lname %>!</h3>
 <%end%>
+
 <p class="well">
+  <% if @profile_user.profile %>
+      <img src=<%= logged_in_user.profile.image %> align="left" style="margin-lef:5px;margin-right:15px;margin-bottom:10px;width:100px;height:110px;">
+  <% end %>
+
   <strong>Full Name: </strong>
-  <%= @profile_user.fname + " " + @profile_user.lname %>
+  <%= @profile_user.fname + ' ' + @profile_user.lname %>
   <br>
   <strong>Username: </strong>
   <%= @profile_user.username%>
@@ -14,7 +19,7 @@
   <strong>City: </strong>
   <%= @profile_user.city %>
   <br>
-  <strong>Cummulative Rating: </strong>
+  <strong>Cumulative Rating: </strong>
   <%= sprintf('%.2f', @profile_user.rating||0) %>
 </p>
 
@@ -22,12 +27,74 @@
     <% if logged_in_user.profile.nil?%>
         <%= link_to 'Complete profile', new_profile_path%>
     <% else %>
+
         <strong>Personal Information</strong><br/>
         <p><%= logged_in_user.profile.about_me%></p>
-		<strong>Gender</strong><br>
-		<p><%= logged_in_user.profile.gender%></p><br>
+		    <strong>Gender</strong><br>
+		    <p><%= logged_in_user.profile.gender%></p>
+
+        <% if logged_in_user.has_address? %>
+            <p>
+              <strong>Address</strong><br>
+              <%= logged_in_user.profile.address.line1 %><br>
+              <% if !logged_in_user.profile.address.line2.nil? && !logged_in_user.profile.address.line2.empty? %>
+                  <%= logged_in_user.profile.address.line2 %><br>
+              <% end %>
+              <%= logged_in_user.profile.address.city + ', ' +
+                      logged_in_user.profile.address.state + '  ' +
+                      logged_in_user.profile.address.zip %><br>
+            </p>
+        <% end %>
+
+        <p>
+          <strong>Permissions</strong><br>
+          <% if logged_in_user.has_teenager_requirements? %>
+              <%= 'Teenager' %><br>
+          <% end %>
+          <% if logged_in_user.has_client_requirements? %>
+              <%= 'Client' %><br>
+          <% end %>
+        </p>
+
+        <br>
         <p><%= link_to 'Edit Profile', edit_profile_path%></p>
     <% end %>
 
     <p> <%= link_to 'Logout', logout_path, :method => :delete %> </p>
+
+
+    <br>
+    <strong>Listings</strong>
+      <style type="text/css">
+        td
+        {  padding:0 15px 0 15px;  }
+      </style>
+
+      <style type="text/css">
+        th
+        {  padding:0 15px 0 15px;  }
+      </style>
+
+      <table class="table">
+        <% @client_requests.each do |client_request| %>
+            <tr>
+              <td><%= ServiceType.find(client_request.service_type_id).name %></td>
+              <td class="breakall"><%= client_request.title %></td>
+              <% address = FreeAddress.find(client_request.address_id) %>
+              <td><%= address.city %></td>
+              <td class="addr hidden"><%= address.zip %></td>
+              <td><%= client_request.period %></td>
+              <td><%= User.find(client_request.user_id).username %></td>
+              <td><%= link_to 'Show', client_request_path(client_request) %></td>
+              <!--td><%= link_to 'Edit', edit_client_request_path(client_request) %></td>
+			<td><%= link_to 'Delete', client_request_path(client_request),
+                      method: :delete,
+                      data: { confirm: 'Are you sure?' } %></td>
+		  </tr-->
+        <% end %>
+      </table>
+
+
+    <%= render "transactions/index" %>
+
 <% end %>

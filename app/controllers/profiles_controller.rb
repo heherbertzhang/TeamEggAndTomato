@@ -3,6 +3,8 @@ class ProfilesController < ApplicationController
     # should allow other to view the page
     # @profile = Profile.find(params[:id])
     @profile_user = User.find(params[:id])
+	  @transactions = Transaction.all
+    @client_requests = ClientRequest.where(user_id: @profile_user.id)
   end
 
   def new
@@ -10,11 +12,11 @@ class ProfilesController < ApplicationController
   end
 
   def create
-    profile = logged_in_user.create_profile(profile_params)
-    if profile.valid?
-      redirect_to profile_path(profile)
+    @profile = logged_in_user.create_profile(profile_params)
+    if @profile.valid?
+      redirect_to profile_path(@profile)
     else
-      redirect_to new_profile_path
+      render 'new'
     end
   end
 
@@ -31,6 +33,6 @@ class ProfilesController < ApplicationController
   private
 
   def profile_params
-    params.require(:profile).permit(:date_of_birth, :about_me, :phone, :gender)
+    params.require(:profile).permit(:date_of_birth, :about_me, :phone, :gender, :image)
   end
 end
